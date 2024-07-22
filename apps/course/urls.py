@@ -1,0 +1,29 @@
+from django.urls import path
+
+from .views.category_views import CategoryDetail, CategoryList
+from .views.course_views import CourseList, CourseDetail, CoursePopularList, CourseEnroll
+from .views.lesson_views import LessonComplete, LessonList, LessonDetail
+from .views.section_views import SectionDetail, SectionList
+from .views.color_views import ColorList, ColorDetail
+
+urlpatterns = [
+    path('courses/', CourseList.as_view(), name='course-list'),
+    path('courses/<uuid:course_id>/', CourseDetail.as_view(), name='course-detail'),
+
+    path('courses/<uuid:course_id>/enroll/', CourseEnroll.as_view(), name='enroll'),
+
+    path('courses/popular/', CoursePopularList.as_view(), name='popular-course-list'),
+
+    path('categories/', CategoryList.as_view(), name='category-list'),
+    path('categories/<uuid:category_id>/', CategoryDetail.as_view(), name='category-detail'),
+
+    path('courses/<uuid:course_id>/sections/', SectionList.as_view(), name='section-list'),
+    path('sections/<uuid:section_id>/', SectionDetail.as_view(), name='section-detail'),
+
+    path('sections/<uuid:section_id>/lessons/', LessonList.as_view(), name='lesson-list'),
+    path('lessons/<uuid:lesson_id>/', LessonDetail.as_view(), name='lesson-detail'),
+    path('lessons/<uuid:lesson_id>/complete/', LessonComplete.as_view(), name='lesson-complete'),
+
+    path('colors/', ColorList.as_view(), name='color-list'),
+    path('colors/<uuid:color_id>/', ColorDetail.as_view(), name='color-detail'),
+]
