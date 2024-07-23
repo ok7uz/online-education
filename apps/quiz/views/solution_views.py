@@ -16,12 +16,12 @@ class QuizSolutionView(APIView):
     @extend_schema(tags=['Quiz Solution'], responses={200: QuizSolutionListSerializer(many=True)})
     def get(self, request, course_id):
         answers = QuizSolution.objects.filter(course_id=course_id)
-        serializer = QuizSolutionListSerializer(answers, many=True)
+        serializer = QuizSolutionListSerializer(answers, many=True, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @extend_schema(tags=['Quiz Solution'], request=QuizSolutionSerializer(), responses={201: QuizSolutionSerializer()})
     def post(self, request, course_id):
-        serializer = self.serializer_class(data=request.data)
+        serializer = self.serializer_class(data=request.data, context={'request': request})
         if serializer.is_valid():
             serializer.save(course_id=course_id)
             return Response(serializer.data, status=status.HTTP_201_CREATED)

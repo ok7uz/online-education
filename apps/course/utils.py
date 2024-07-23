@@ -20,8 +20,8 @@ def reordering_lessons(lessons):
 
 
 def parting_course(course, lessons):
-    lessons_count = course.lessons_count
-    lessons_per_part = course.lessons_per_part
+    lessons_count = course.lesson_count
+    lessons_per_part = course.part_lesson_count
     course_part_model = ContentType.objects.get(app_label="course", model="coursepart").model_class()
     
     for start_index in range(0, lessons_count, lessons_per_part):

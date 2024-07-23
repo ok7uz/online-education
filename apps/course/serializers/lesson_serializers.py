@@ -28,12 +28,13 @@ class LessonSerializer(serializers.ModelSerializer):
     video = VideoSerializer(read_only=True)
     quiz_group = QuizGroupSerializer(read_only=True)
     completed = serializers.SerializerMethodField(read_only=True)
+    is_available = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Lesson
         fields = [
             'id', 'title', 'content', 'order', 'video_1080p', 'video_720p', 'video_480p', 'video_360p', 
-            'video', 'duration', 'completed', 'quiz_group', 'quiz_group_id', 'created_at'
+            'video', 'duration', 'completed', 'is_available', 'quiz_group', 'quiz_group_id', 'created_at'
         ]
         read_only_fields = ['id', 'created_at', 'order']
 
@@ -41,7 +42,14 @@ class LessonSerializer(serializers.ModelSerializer):
         user = self.context.get('request').user
         if user.is_anonymous:
             return False
-        return CompletedLesson.objects.filter(user=user, lesson=lesson).exists()
+        return lesson.completed_by_users.filter(user=user).exists()
+
+    def get_is_available(self, lesson) -> bool:
+        if lesson.order == 1:
+            return True
+        user = self.context.get('request').user
+        prev_lesson = Lesson.objects.filter(section=lesson.section, order=lesson.order - 1).first()
+        return prev_lesson and prev_lesson.completed_by_users.filter(user=user).exists()
 
     @staticmethod
     def validate_section_id(value):
@@ -88,5 +96,5 @@ class LessonListSerializer(LessonSerializer):
 
     class Meta:
         model = Lesson
-        fields = ['id', 'title', 'content', 'order', 'duration', 'completed', 'created_at']
+        fields = ['id', 'title', 'order', 'duration', 'completed', 'is_available', 'created_at']
         read_only_fields = ['id', 'created_at', 'order']

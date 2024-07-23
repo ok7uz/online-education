@@ -59,9 +59,9 @@ class Course(models.Model):
     video = models.FileField(upload_to='course-videos/')
     color1 = models.ForeignKey(Color, on_delete=models.CASCADE, related_name='courses_in_1st', verbose_name='1st color')
     color2 = models.ForeignKey(Color, on_delete=models.CASCADE, related_name='courses_in_2st', verbose_name='2nd color')
-    lessons_per_part = models.PositiveSmallIntegerField(default=10, verbose_name='Lessons per Part')
-    price_per_lesson = models.PositiveIntegerField(default=0, verbose_name="price per lesson")
-
+    part_lesson_count = models.PositiveIntegerField(verbose_name="part lesson count", default=10)
+    lesson_price = models.PositiveIntegerField(verbose_name="lesson price")
+    discounted_lesson_price = models.PositiveIntegerField(verbose_name="discounted lesson price", null=True)
     created_at = models.DateField(auto_now_add=True, verbose_name="created at")
 
     class Meta:
@@ -71,15 +71,15 @@ class Course(models.Model):
         ordering = ['-created_at']
 
     @property
-    def lessons_count(self) -> int:
+    def lesson_count(self) -> int:
         return Lesson.objects.filter(section__course=self).count()
     
     @property
-    def students_count(self) -> int:
+    def student_count(self) -> int:
         return self.enrollments.count()
     
     @property
-    def reviews_count(self) -> int:
+    def review_count(self) -> int:
         return self.reviews.count()
 
     @property
@@ -96,7 +96,13 @@ class Course(models.Model):
     
     @property
     def price(self) -> int:
-        return self.price_per_lesson * self.lessons_count
+        return self.lesson_price * self.lesson_count
+
+    @property
+    def discounted_price(self) -> int:
+        if self.discounted_lesson_price:
+            return self.discounted_lesson_price * self.lesson_count
+        return None
 
     def __str__(self):
         return self.title
@@ -123,7 +129,7 @@ class Section(models.Model):
         ordering = ['-created_at']
 
     @property
-    def lessons_count(self) -> int:
+    def lesson_count(self) -> int:
         return self.lessons.count()
 
     @property
@@ -135,7 +141,13 @@ class Section(models.Model):
     
     @property
     def price(self) -> int:
-        return self.course.price_per_lesson * self.lessons_count
+        return self.course.lesson_price * self.lesson_count
+
+    @property
+    def discounted_price(self) -> int:
+        if self.course.discounted_lesson_price:
+            return self.course.discounted_lesson_price * self.lesson_count
+        return None
 
     def save(self, *args, **kwargs):
         course_sections = self.course.sections.all()
@@ -219,7 +231,7 @@ class CompletedLesson(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE,
                              related_name='completed_lessons', verbose_name="user", db_index=True)
     lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE,
-                               related_name='completed_by_users', verbose_name="lesson", db_index=True)
+                               related_name='completed_by_users', verbose_name='lesson', db_index=True)
     completed_at = models.DateTimeField(auto_now_add=True, verbose_name="completed at")
 
     class Meta:
@@ -247,6 +259,26 @@ class Enrollment(models.Model):
         verbose_name_plural = 'enrollments'
         ordering = ['created_at']
         unique_together = ('course', 'user')
+
+    def __str__(self):
+        return "{}'s enrollment to {}".format(self.user, self.course)
+
+
+class PartEnrollment(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(User, on_delete=models.CASCADE,
+                             related_name='part_enrollments', verbose_name="user", db_index=True)
+    part = models.ForeignKey('course.CoursePart', on_delete=models.CASCADE,
+                               related_name='part_enrollments', verbose_name="course", db_index=True)
+
+    created_at = models.DateField(auto_now_add=True, verbose_name="created at")
+
+    class Meta:
+        db_table = 'part_enrollment'
+        verbose_name = 'part enrollment'
+        verbose_name_plural = 'part enrollments'
+        ordering = ['created_at']
+        unique_together = ('part', 'user')
 
     def __str__(self):
         return "{}'s enrollment to {}".format(self.user, self.course)

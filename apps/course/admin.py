@@ -13,14 +13,14 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Course)
 class CourseAdmin(admin.ModelAdmin):
-    list_display = ('title', 'category', 'average_rating', 'duration', 'lessons_count')
+    list_display = ('title', 'category', 'average_rating', 'duration', 'lesson_count')
     list_filter = ('category',)
     fields = (
         'title', 'teacher', 'category', ('color1', 'color1_bar'), ('color2', 'color2_bar'),
-        'description', 'image', 'lessons_per_part', 'price_per_lesson', 
-        'average_rating', 'duration', 'lessons_count', 'created_at'
+        'description', 'image', 'lesson_per_part', 'price_per_lesson',
+        'average_rating', 'duration', 'lesson_count', 'created_at'
     )
-    readonly_fields = ('average_rating', 'duration', 'created_at', 'lessons_count', 'color1_bar', 'color2_bar')
+    readonly_fields = ('average_rating', 'duration', 'created_at', 'lesson_count', 'color1_bar', 'color2_bar')
     search_fields = ('title',)
 
     def color1_bar(self, course):
@@ -37,10 +37,10 @@ class CourseAdmin(admin.ModelAdmin):
 
 @admin.register(Section)
 class SectionAdmin(admin.ModelAdmin):
-    list_display = ('title', 'course', 'order', 'duration', 'lessons_count')
+    list_display = ('title', 'course', 'order', 'duration', 'lesson_count')
     list_filter = ('course',)
-    fields = ('title', 'course', 'duration', 'lessons_count', 'created_at')
-    readonly_fields = ('created_at', 'duration', 'lessons_count', 'order')
+    fields = ('title', 'course', 'duration', 'lesson_count', 'created_at')
+    readonly_fields = ('created_at', 'duration', 'lesson_count', 'order')
     ordering = ('course__title', 'order')
 
 

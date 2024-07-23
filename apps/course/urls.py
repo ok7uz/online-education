@@ -1,7 +1,8 @@
 from django.urls import path
 
 from .views.category_views import CategoryDetail, CategoryList
-from .views.course_views import CourseList, CourseDetail, CoursePopularList, CourseEnroll
+from .views.course_views import CourseList, CourseDetail, CoursePopularList
+from .views.enroll_views import PartEnrollView
 from .views.lesson_views import LessonComplete, LessonList, LessonDetail
 from .views.section_views import SectionDetail, SectionList
 from .views.color_views import ColorList, ColorDetail
@@ -10,7 +11,9 @@ urlpatterns = [
     path('courses/', CourseList.as_view(), name='course-list'),
     path('courses/<uuid:course_id>/', CourseDetail.as_view(), name='course-detail'),
 
-    path('courses/<uuid:course_id>/enroll/', CourseEnroll.as_view(), name='enroll'),
+    path('course-parts/<uuid:part_id>/enroll/', PartEnrollView.as_view(), name='part-enroll'),
+
+    # path('courses/<uuid:course_id>/enroll/', CourseEnroll.as_view(), name='enroll'),
 
     path('courses/popular/', CoursePopularList.as_view(), name='popular-course-list'),
 

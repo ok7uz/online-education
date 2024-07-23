@@ -1,11 +1,10 @@
-from tokenize import group
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 from rest_framework.generics import get_object_or_404
 
 from .color_serializers import ColorSerializer
-from .course_part_serializers import CoursePartSerializer
-from ..models import Color, CompletedLesson, Course, Category
+from .part_serializers import CoursePartListSerializer, CoursePartSerializer
+from ..models import Color, CompletedLesson, Course, Category, Lesson
 from ...accounts.models import User
 from ...accounts.serializers import TeacherSerializer
 
@@ -24,8 +23,8 @@ class CourseListSerializer(serializers.ModelSerializer):
         model = Course
         fields = [
             'id', 'title', 'description', 'duration', 'category_name', 'teacher', 'image', 'video',
-            'color1', 'color2', 'price', 'enrolled', 'completed_percentage', 'average_rating',
-            'lessons_count', 'students_count', 'is_fragment',  'created_at',
+            'color1', 'color2', 'price', 'discounted_price', 'enrolled', 'completed_percentage', 'average_rating',
+            'lesson_count', 'student_count', 'is_fragment', 'created_at',
         ]
 
     def get_enrolled(self, course) -> bool:
@@ -37,9 +36,9 @@ class CourseListSerializer(serializers.ModelSerializer):
         user = self.context.get('request').user
         if not user.is_authenticated:
             return 0
-        lessons_count = course.lessons_count
-        completed_lessons_count = CompletedLesson.objects.filter(user=user, lesson__section__course=course).count()
-        return completed_lessons_count * 100 // lessons_count if lessons_count > 0 else 0
+        lesson_count = course.lesson_count
+        completed_lesson_count = CompletedLesson.objects.filter(user=user, lesson__section__course=course).count()
+        return completed_lesson_count * 100 // lesson_count if lesson_count > 0 else 0
 
 
 class CourseSerializer(CourseListSerializer):
@@ -58,9 +57,9 @@ class CourseSerializer(CourseListSerializer):
         model = Course
         fields = [
             'id', 'title', 'description', 'category_name', 'category_id', 'teacher_id', 'teacher', 'color1', 'color2',
-            'color1_id', 'color2_id', 'image', 'video', 'price_per_lesson', 'lessons_per_part', 'price', 'duration',
-            'enrolled', 'average_rating', 'lessons_count', 'students_count', 'reviews_count',  'is_fragment',
-            'completed_percentage', 'parts', 'created_at'
+            'color1_id', 'color2_id', 'image', 'video', 'lesson_price', 'discounted_lesson_price', 'part_lesson_count',
+            'price', 'discounted_price', 'duration', 'enrolled', 'average_rating', 'lesson_count', 'student_count',
+            'review_count', 'is_fragment', 'completed_percentage', 'parts', 'created_at'
         ]
 
     @staticmethod

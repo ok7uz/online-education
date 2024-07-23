@@ -12,7 +12,7 @@ class SectionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Section
-        fields = ['id', 'title', 'completed_percentage', 'duration', 'order', 'created_at', 'lessons_count', 'lessons']
+        fields = ['id', 'title', 'completed_percentage', 'duration', 'order', 'created_at', 'lesson_count', 'lessons']
         read_only_fields = ['id', 'duration', 'created_at', 'lessons', 'order']
 
     @staticmethod
@@ -25,9 +25,9 @@ class SectionSerializer(serializers.ModelSerializer):
         user = self.context.get('request').user
         if user.is_anonymous:
             return 0
-        lessons_count = section.lessons_count
-        completed_lessons_count = CompletedLesson.objects.filter(user=user, lesson__section=section).count()
-        return completed_lessons_count * 100 // lessons_count if lessons_count > 0 else 0
+        lesson_count = section.lesson_count
+        completed_lesson_count = CompletedLesson.objects.filter(user=user, lesson__section=section).count()
+        return completed_lesson_count * 100 // lesson_count if lesson_count > 0 else 0
 
     def create(self, validated_data):
         course_id = self.context.get('course_id')
@@ -39,4 +39,4 @@ class SectionShortInfo(SectionSerializer):
 
     class Meta:
         model = Section
-        fields = ['id', 'title', 'duration', 'order', 'lessons_count', 'completed_percentage']
+        fields = ['id', 'title', 'duration', 'order', 'lesson_count', 'completed_percentage']

@@ -24,7 +24,7 @@ class QuizSolution(models.Model):
 
 
 class QuizGroup(models.Model):
-    id = CustomIDField(primary_key=True)
+    id = CustomIDField(primary_key=True, editable=False)
     title = models.CharField(max_length=250)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
