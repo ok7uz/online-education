@@ -24,6 +24,7 @@ class LessonSerializer(serializers.ModelSerializer):
     video_480p = serializers.URLField(write_only=True)
     video_360p = serializers.URLField(write_only=True)
     quiz_group_id = serializers.CharField(write_only=True)
+    duration = serializers.IntegerField(min_value=1)
 
     video = VideoSerializer(read_only=True)
     quiz_group = QuizGroupSerializer(read_only=True)
@@ -42,24 +43,23 @@ class LessonSerializer(serializers.ModelSerializer):
         user = self.context.get('request').user
         if user.is_anonymous:
             return False
-        return lesson.completed_by_users.filter(user=user).exists()
+        return CompletedLesson.objects.filter(user=user, lesson=lesson).exists()
 
     def get_is_available(self, lesson) -> bool:
+        user = self.context.get('request').user
+        if user.is_anonymous or not user.enrollments.filter(course=lesson.section.course).exists():
+            return False
         if lesson.order == 1:
             return True
-        user = self.context.get('request').user
-        prev_lesson = Lesson.objects.filter(section=lesson.section, order=lesson.order - 1).first()
-        return prev_lesson and prev_lesson.completed_by_users.filter(user=user).exists()
+        return CompletedLesson.objects.filter(
+            user=user,
+            lesson__section=lesson.section,
+            lesson__order=lesson.order - 1
+        ).exists()
 
     @staticmethod
     def validate_section_id(value):
         get_object_or_404(Section, id=value)
-        return value
-
-    @staticmethod
-    def validate_duration(value):
-        if value <= 0:
-            raise serializers.ValidationError("Duration must be a positive integer.")
         return value
 
     def create(self, validated_data):

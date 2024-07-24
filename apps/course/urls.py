@@ -4,6 +4,7 @@ from .views.category_views import CategoryDetail, CategoryList
 from .views.course_views import CourseList, CourseDetail, CoursePopularList
 from .views.enroll_views import PartEnrollView
 from .views.lesson_views import LessonComplete, LessonList, LessonDetail
+from .views.part_views import CoursePartDetailView
 from .views.section_views import SectionDetail, SectionList
 from .views.color_views import ColorList, ColorDetail
 
@@ -11,6 +12,7 @@ urlpatterns = [
     path('courses/', CourseList.as_view(), name='course-list'),
     path('courses/<uuid:course_id>/', CourseDetail.as_view(), name='course-detail'),
 
+    path('course-parts/<uuid:part_id>/', CoursePartDetailView.as_view(), name='part-detail'),
     path('course-parts/<uuid:part_id>/enroll/', PartEnrollView.as_view(), name='part-enroll'),
 
     # path('courses/<uuid:course_id>/enroll/', CourseEnroll.as_view(), name='enroll'),

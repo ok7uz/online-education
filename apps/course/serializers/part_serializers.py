@@ -2,7 +2,7 @@ from django.db.models import Sum
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 
-from apps.course.models import Section, CompletedLesson, CoursePart
+from apps.course.models import Section, CompletedLesson, CoursePart, Lesson
 from apps.course.serializers.lesson_serializers import LessonListSerializer
 
 
@@ -64,7 +64,7 @@ class CoursePartSerializer(serializers.ModelSerializer):
 
     @extend_schema_field(CoursePartSectionsSerializer(many=True))
     def get_sections(self, part):
-        lessons = part.lessons.all()
+        lessons = Lesson.objects.filter(part=part).select_related('section').prefetch_related('section__course')
         self.context['lessons'] = lessons
         section_ids = lessons.values_list('section', flat=True).distinct()
         sections = Section.objects.filter(id__in=section_ids)
@@ -79,4 +79,4 @@ class CoursePartListSerializer(CoursePartSerializer):
 
     class Meta:
         model = CoursePart
-        fields = ('id', 'order', 'price', 'lesson_count')
+        fields = ('id', 'order', 'price', 'discounted_price', 'lesson_count', 'is_available')

@@ -15,13 +15,12 @@ class CourseFilter(filters.FilterSet):
         fields = ['search', 'category', 'teacher', 'enrolled']
 
     def filter_enrolled(self, queryset, _, value):
-        user = self.request.user
-        if not user.is_authenticated:
+        user = self.request.get('user', None)
+        if not user or not user.is_authenticated:
             return queryset.none()
-        match value:
-            case True:
-                return queryset.filter(enrollments__user=user)
-            case False:
-                return queryset.exclude(enrollments__user=user)
-            case _:
-                return queryset
+
+        if value is True:
+            return queryset.filter(enrollments__user=user)
+        elif value is False:
+            return queryset.exclude(enrollments__user=user)
+        return queryset

@@ -9,7 +9,7 @@ from rest_framework.views import APIView
 from apps.course.filters import CourseFilter
 from apps.course.models import Course, Enrollment
 from apps.course.serializers.course_serializers import CourseListSerializer, CourseSerializer
-from config.permissons import IsAdmin, IsAuth, IsAdminOrReadOnly
+from config.permissons import IsAuth, IsAdminOrReadOnly
 
 POPULAR_COURSES_COUNT = 3
 MANUAL_PARAMETERS = [

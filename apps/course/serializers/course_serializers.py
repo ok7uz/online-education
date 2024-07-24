@@ -3,10 +3,10 @@ from rest_framework import serializers
 from rest_framework.generics import get_object_or_404
 
 from .color_serializers import ColorSerializer
-from .part_serializers import CoursePartListSerializer, CoursePartSerializer
-from ..models import Color, CompletedLesson, Course, Category, Lesson
-from ...accounts.models import User
-from ...accounts.serializers import TeacherSerializer
+from .part_serializers import CoursePartListSerializer
+from ..models import Color, CompletedLesson, Course, Category, Lesson, CoursePart
+from apps.accounts.models import User
+from apps.accounts.serializers import TeacherSerializer
 
 
 class CourseListSerializer(serializers.ModelSerializer):
@@ -50,6 +50,7 @@ class CourseSerializer(CourseListSerializer):
     color1 = ColorSerializer(read_only=True)
     color2 = ColorSerializer(read_only=True)
 
+    last_available_lesson_id = serializers.SerializerMethodField(read_only=True)
     average_rating = serializers.FloatField(min_value=0, max_value=5, read_only=True)
     parts = serializers.SerializerMethodField(read_only=True)
 
@@ -59,7 +60,7 @@ class CourseSerializer(CourseListSerializer):
             'id', 'title', 'description', 'category_name', 'category_id', 'teacher_id', 'teacher', 'color1', 'color2',
             'color1_id', 'color2_id', 'image', 'video', 'lesson_price', 'discounted_lesson_price', 'part_lesson_count',
             'price', 'discounted_price', 'duration', 'enrolled', 'average_rating', 'lesson_count', 'student_count',
-            'review_count', 'is_fragment', 'completed_percentage', 'parts', 'created_at'
+            'review_count', 'is_fragment', 'completed_percentage', 'last_available_lesson_id', 'parts', 'created_at'
         ]
 
     @staticmethod
@@ -79,10 +80,29 @@ class CourseSerializer(CourseListSerializer):
             raise serializers.ValidationError('The submitted file is not a video file')
         return value
 
-    @extend_schema_field(CoursePartSerializer(many=True))
-    def get_parts(self, value):
-        parts = value.parts.all()
-        return CoursePartSerializer(parts, many=True, context=self.context).data
+    @extend_schema_field(CoursePartListSerializer(many=True))
+    def get_parts(self, course):
+        parts = CoursePart.objects.filter(course=course).select_related('course').prefetch_related('lessons')
+        print(parts.query)
+        return CoursePartListSerializer(parts, many=True, context=self.context).data
+
+    @extend_schema_field(serializers.UUIDField())
+    def get_last_available_lesson_id(self, course):
+        user = self.context.get('request').user
+        if not user.is_authenticated:
+            return None
+
+        last_completed_lesson = user.completed_lessons.filter(lesson__section__course=course).last()
+        if last_completed_lesson:
+            last_available_lesson = Lesson.objects.filter(section__course=course,
+                                                          order__gt=last_completed_lesson.order).first()
+        else:
+            last_available_lesson = Lesson.objects.filter(section__course=course).first()
+
+        if last_available_lesson and user.part_enrollments.filter(part=last_available_lesson.part).exists():
+            return last_available_lesson.id
+
+        return None
 
     def create(self, validated_data):
         color1_data = validated_data.pop('color1')

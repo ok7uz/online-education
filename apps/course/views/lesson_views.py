@@ -7,11 +7,12 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 from apps.course.models import Lesson, CompletedLesson
 from apps.course.serializers.lesson_serializers import LessonSerializer
-from config.permissons import IsAdmin, IsAuth
+from config.permissons import IsAdmin, IsAuth, IsAdminOrReadOnly
 
 
 class LessonList(APIView):
     serializer_class = LessonSerializer
+    permission_classes = IsAdminOrReadOnly,
 
     @extend_schema(tags=['Lesson'], responses={200: serializer_class(many=True)})
     def get(self, request, section_id):
@@ -26,15 +27,11 @@ class LessonList(APIView):
             serializer.save(section_id=section_id)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    def get_permissions(self):
-        if self.request.method in ('POST', 'PUT', 'DELETE'):
-            return IsAdmin(),
-        return IsAuthenticatedOrReadOnly(),
 
 
 class LessonDetail(APIView):
     serializer_class = LessonSerializer
+    permission_classes = IsAdminOrReadOnly,
 
     @extend_schema(tags=['Lesson'], responses={200: serializer_class()})
     def get(self, request, lesson_id):
@@ -56,11 +53,6 @@ class LessonDetail(APIView):
         lesson = get_object_or_404(Lesson, pk=lesson_id)
         lesson.delete()
         return Response('No Content', status=status.HTTP_200_OK)
-
-    def get_permissions(self):
-        if self.request.method in ('POST', 'PUT', 'DELETE'):
-            return IsAdmin(),
-        return IsAuthenticatedOrReadOnly(),
 
 
 class LessonComplete(APIView):

@@ -12,7 +12,7 @@ class PartEnrollView(APIView):
     serializer_class = None
     permission_classes = IsAuth,
 
-    @extend_schema(tags=['Enroll'], request=None, responses={200: OpenApiResponse(description='Enrolled')})
+    @extend_schema(tags=['Course Part'], request=None, responses={200: OpenApiResponse(description='Enrolled')})
     def post(self, request, part_id):
         user = request.user
         course_part = get_object_or_404(CoursePart, id=part_id)
