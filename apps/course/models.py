@@ -60,7 +60,7 @@ class Course(models.Model):
     color1 = models.ForeignKey(Color, on_delete=models.CASCADE, related_name='courses_in_1st', verbose_name='1st color')
     color2 = models.ForeignKey(Color, on_delete=models.CASCADE, related_name='courses_in_2st', verbose_name='2nd color')
     part_lesson_count = models.PositiveIntegerField(verbose_name="part lesson count", default=10)
-    lesson_price = models.PositiveIntegerField(verbose_name="lesson price")
+    lesson_price = models.PositiveIntegerField(verbose_name="lesson price", null=True)
     discounted_lesson_price = models.PositiveIntegerField(verbose_name="discounted lesson price", null=True)
     created_at = models.DateField(auto_now_add=True, verbose_name="created at")
 
@@ -303,3 +303,20 @@ class CoursePart(models.Model):
         if not self.order:
             self.order = course_parts.count() + 1
         return super().save(*args, **kwargs)
+
+
+class CourseBookmark(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(User, on_delete=models.CASCADE,
+                             related_name='bookmarks', verbose_name="user", db_index=True)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE,
+                               related_name='bookmarks', verbose_name="course", db_index=True)
+
+    class Meta:
+        db_table = 'course_bookmark'
+        verbose_name = 'course bookmark'
+        verbose_name_plural = 'course bookmarks'
+        unique_together = ('user', 'course')
+
+    def __str__(self):
+        return "{}'s bookmark of {}".format(self.user, self.course)

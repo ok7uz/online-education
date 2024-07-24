@@ -16,7 +16,7 @@ class Review(models.Model):
     comment = models.TextField(verbose_name="comment")
     rating = models.PositiveSmallIntegerField(verbose_name="rating")
 
-    created_at = models.DateField(auto_now_add=True, verbose_name="created at")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="created at")
 
     class Meta:
         db_table = 'review'

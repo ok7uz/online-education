@@ -1,16 +1,22 @@
 from django.contrib.auth.models import Group
 from django.db.models import Prefetch
+from drf_spectacular.types import OpenApiTypes
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema, OpenApiParameter
 
+from apps.accounts.filters import UserFilter
 from apps.accounts.serializers import UserSerializer, TeacherSerializer, RegisterSerializer
 from apps.accounts.models import User
 from apps.course.models import Course
 from config.permissons import IsAdminOrReadOnly, IsAuth
+
+TEACHER_MANUAL_PARAMETERS = [
+    OpenApiParameter('search', type=OpenApiTypes.STR, location=OpenApiParameter.QUERY, description="Searching"),
+]
 
 
 class ProfileAPIView(APIView):
@@ -70,16 +76,19 @@ class TeacherListAPIView(APIView):
 
     @extend_schema(
         responses={200: TeacherSerializer},
+        parameters=TEACHER_MANUAL_PARAMETERS,
         tags=['Teacher'],
         description='Get teacher list'
     )
     def get(self, request):
-        users = User.objects.filter(groups__name='teacher').prefetch_related(
+        teachers = User.objects.filter(groups__name='teacher').prefetch_related(
             Prefetch('courses', queryset=Course.objects.all())
         ).prefetch_related(
             Prefetch('enrollments__course__teacher', queryset=User.objects.all())
         ).order_by('created_at')
-        serializer = self.serializer_class(users, many=True, context={'request': request})
+        user_filter = UserFilter(data=request.GET, request=request, queryset=teachers)
+        filtered_teachers = user_filter.qs if user_filter.is_valid() else teachers.none()
+        serializer = self.serializer_class(filtered_teachers, many=True, context={'request': request})
         return Response(serializer.data)
 
     @extend_schema(
