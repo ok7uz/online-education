@@ -2,6 +2,7 @@ from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 from rest_framework.generics import get_object_or_404
 
+from config.utils import TimestampField
 from .color_serializers import ColorSerializer
 from .part_serializers import CoursePartListSerializer
 from ..models import Color, CompletedLesson, Course, Category, Lesson, CoursePart
@@ -18,6 +19,7 @@ class CourseListSerializer(serializers.ModelSerializer):
     average_rating = serializers.FloatField(read_only=True)
     color1 = ColorSerializer(read_only=True)
     color2 = ColorSerializer(read_only=True)
+    created_at = TimestampField(read_only=True, help_text='Course created at timestamp')
 
     class Meta:
         model = Course

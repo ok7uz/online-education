@@ -19,9 +19,10 @@ COURSE_MANUAL_PARAMETERS = [
     OpenApiParameter('price_min', type=OpenApiTypes.INT, location=OpenApiParameter.QUERY, description="Min price"),
     OpenApiParameter('price_max', type=OpenApiTypes.INT, location=OpenApiParameter.QUERY, description="Max price"),
     OpenApiParameter('rating', type=OpenApiTypes.INT, location=OpenApiParameter.QUERY, description="Rating"),
-    OpenApiParameter('teacher', type=OpenApiTypes.STR, location=OpenApiParameter.QUERY, description="Teacher"),
+    OpenApiParameter('teacher_id', type=OpenApiTypes.UUID, location=OpenApiParameter.QUERY, description="Teacher ID"),
     OpenApiParameter('enrolled', type=OpenApiTypes.STR, location=OpenApiParameter.QUERY, description="Enrolled"),
     OpenApiParameter('bookmarked', type=OpenApiTypes.BOOL, location=OpenApiParameter.QUERY, description="Bookmarked"),
+    OpenApiParameter('completed', type=OpenApiTypes.BOOL, location=OpenApiParameter.QUERY, description="Completed"),
 ]
 
 

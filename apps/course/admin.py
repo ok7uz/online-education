@@ -7,8 +7,8 @@ from apps.course.models import Color, CompletedLesson, Course, Section, Lesson, 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ('name', 'courses_count')
-    fields = ('name', 'courses_count', 'created_at')
-    readonly_fields = ('courses_count', 'created_at')
+    fields = ('name', 'courses_count')
+    readonly_fields = 'courses_count',
 
 
 @admin.register(Course)
@@ -39,8 +39,8 @@ class CourseAdmin(admin.ModelAdmin):
 class SectionAdmin(admin.ModelAdmin):
     list_display = ('title', 'course', 'order', 'duration', 'lesson_count')
     list_filter = ('course',)
-    fields = ('title', 'course', 'duration', 'lesson_count', 'created_at')
-    readonly_fields = ('created_at', 'duration', 'lesson_count', 'order')
+    fields = ('title', 'course', 'duration', 'lesson_count')
+    readonly_fields = ('duration', 'lesson_count', 'order')
     ordering = ('course__title', 'order')
 
 
@@ -48,8 +48,8 @@ class SectionAdmin(admin.ModelAdmin):
 class LessonAdmin(admin.ModelAdmin):
     list_display = ('title', 'course', 'section', 'order', 'duration')
     list_filter = ('section',)
-    fields = ('title', 'section', 'content', 'duration', 'created_at')
-    readonly_fields = ('course', 'created_at', 'order')
+    fields = ('title', 'section', 'content', 'duration')
+    readonly_fields = ('course', 'order')
     ordering = ('section__course__title', 'section__order', 'order')
 
     @staticmethod

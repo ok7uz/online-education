@@ -35,9 +35,9 @@ class LessonSerializer(serializers.ModelSerializer):
         model = Lesson
         fields = [
             'id', 'title', 'content', 'order', 'video_1080p', 'video_720p', 'video_480p', 'video_360p', 
-            'video', 'duration', 'completed', 'is_available', 'quiz_group', 'quiz_group_id', 'created_at'
+            'video', 'duration', 'completed', 'is_available', 'quiz_group', 'quiz_group_id',
         ]
-        read_only_fields = ['id', 'created_at', 'order']
+        read_only_fields = ['id', 'order']
 
     def get_completed(self, lesson) -> bool:
         user = self.context.get('request').user
@@ -96,5 +96,5 @@ class LessonListSerializer(LessonSerializer):
 
     class Meta:
         model = Lesson
-        fields = ['id', 'title', 'order', 'duration', 'completed', 'is_available', 'created_at']
-        read_only_fields = ['id', 'created_at', 'order']
+        fields = ['id', 'title', 'order', 'duration', 'completed', 'is_available']
+        read_only_fields = ['id', 'order']

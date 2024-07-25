@@ -14,20 +14,15 @@ class Category(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=100, verbose_name='name')
 
-    created_at = models.DateField(auto_now_add=True, verbose_name="created at")
-
     class Meta:
         db_table = 'category'
         verbose_name = 'category'
         verbose_name_plural = 'categories'
-        ordering = ['-created_at']
+        ordering = 'name',
 
     @property
     def courses_count(self) -> int:
         return self.courses.count()
-    
-    def __str__(self):
-        return self.name
 
 
 class Color(models.Model):
@@ -62,7 +57,7 @@ class Course(models.Model):
     part_lesson_count = models.PositiveIntegerField(verbose_name="part lesson count", default=10)
     lesson_price = models.PositiveIntegerField(verbose_name="lesson price", null=True)
     discounted_lesson_price = models.PositiveIntegerField(verbose_name="discounted lesson price", null=True)
-    created_at = models.DateField(auto_now_add=True, verbose_name="created at")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="created at")
 
     class Meta:
         db_table = 'course'
@@ -120,13 +115,11 @@ class Section(models.Model):
                                related_name='sections', verbose_name="course", db_index=True)
     order = models.SmallIntegerField(blank=True, verbose_name='order')
 
-    created_at = models.DateField(auto_now_add=True, verbose_name="created at")
-
     class Meta:
         db_table = 'section'
         verbose_name = 'section'
         verbose_name_plural = 'sections'
-        ordering = ['-created_at']
+        ordering = 'order',
 
     @property
     def lesson_count(self) -> int:
@@ -155,9 +148,6 @@ class Section(models.Model):
             self.order = course_sections.count() + 1
         return super().save(*args, **kwargs)
 
-    def __str__(self):
-        return self.title
-
 
 @receiver(post_save, sender=Section)
 @receiver(post_delete, sender=Section)
@@ -178,13 +168,11 @@ class Lesson(models.Model):
     order = models.SmallIntegerField(blank=True, verbose_name='order')
     quiz_group = models.ForeignKey('quiz.QuizGroup', on_delete=models.CASCADE, db_index=True)
 
-    created_at = models.DateField(auto_now_add=True, verbose_name="created at")
-
     class Meta:
         db_table = 'lesson'
         verbose_name = 'lesson'
         verbose_name_plural = 'lessons'
-        ordering = ['order']
+        ordering = 'order',
 
     def save(self, *args, **kwargs):
         course_lessons = Lesson.objects.filter(section__course=self.section.course)
@@ -193,9 +181,6 @@ class Lesson(models.Model):
         super().save(*args, **kwargs)
         lessons = Lesson.objects.filter(section__course=self.section.course)
         parting_course(self.section.course, lessons)
-
-    def __str__(self):
-        return self.title
     
 
 @receiver(post_save, sender=Lesson)
@@ -240,9 +225,6 @@ class CompletedLesson(models.Model):
         verbose_name_plural = 'completed lessons'
         unique_together = ('user', 'lesson')
 
-    def __str__(self):
-        return f"{self.user.username}'s completion of {self.lesson.title}"
-
 
 class Enrollment(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -257,11 +239,8 @@ class Enrollment(models.Model):
         db_table = 'enrollment'
         verbose_name = 'enrollment'
         verbose_name_plural = 'enrollments'
-        ordering = ['created_at']
+        ordering = 'user', 'course', 'created_at'
         unique_together = ('course', 'user')
-
-    def __str__(self):
-        return "{}'s enrollment to {}".format(self.user, self.course)
 
 
 class PartEnrollment(models.Model):
@@ -269,7 +248,7 @@ class PartEnrollment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE,
                              related_name='part_enrollments', verbose_name="user", db_index=True)
     part = models.ForeignKey('course.CoursePart', on_delete=models.CASCADE,
-                               related_name='part_enrollments', verbose_name="course", db_index=True)
+                             related_name='part_enrollments', db_index=True)
 
     created_at = models.DateField(auto_now_add=True, verbose_name="created at")
 
@@ -279,9 +258,6 @@ class PartEnrollment(models.Model):
         verbose_name_plural = 'part enrollments'
         ordering = ['created_at']
         unique_together = ('part', 'user')
-
-    def __str__(self):
-        return "{}'s enrollment to {}".format(self.user, self.course)
 
 
 class CoursePart(models.Model):

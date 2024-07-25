@@ -8,7 +8,7 @@ class CategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Category
-        fields = ['id', 'name', 'courses_count', 'created_at']
+        fields = ['id', 'name', 'courses_count']
 
     @staticmethod
     def validate_name(value):

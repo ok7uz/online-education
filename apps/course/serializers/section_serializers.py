@@ -12,7 +12,7 @@ class SectionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Section
-        fields = ['id', 'title', 'completed_percentage', 'duration', 'order', 'created_at', 'lesson_count', 'lessons']
+        fields = ['id', 'title', 'completed_percentage', 'duration', 'order', 'lesson_count', 'lessons']
         read_only_fields = ['id', 'duration', 'created_at', 'lessons', 'order']
 
     @staticmethod

@@ -13,7 +13,7 @@ class Review(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE,
                              related_name='reviews', verbose_name="user", db_index=True)
 
-    comment = models.TextField(verbose_name="comment")
+    comment = models.TextField(null=True)
     rating = models.PositiveSmallIntegerField(verbose_name="rating")
 
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="created at")

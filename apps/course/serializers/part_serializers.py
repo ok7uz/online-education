@@ -14,7 +14,7 @@ class CoursePartSectionsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Section
-        fields = ('id', 'title', 'completed_percentage', 'duration', 'order', 'created_at', 'lesson_count', 'lessons')
+        fields = ('id', 'title', 'completed_percentage', 'duration', 'order', 'lesson_count', 'lessons')
 
     @extend_schema_field(LessonListSerializer(many=True))
     def get_lessons(self, section):
