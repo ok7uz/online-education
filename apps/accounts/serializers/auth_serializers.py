@@ -16,8 +16,8 @@ from apps.accounts.models import User
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField(write_only=True)
     password = PasswordField(write_only=True)
-    refresh = serializers.CharField(read_only=True)
-    access = serializers.CharField(read_only=True)
+    refresh = serializers.CharField(read_only=True, min_length=200, max_length=300)
+    access = serializers.CharField(read_only=True, min_length=200, max_length=300)
 
     def validate(self, attrs):
         user = authenticate(**attrs)
@@ -43,13 +43,13 @@ class LoginSerializer(serializers.Serializer):
 class RegisterSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(write_only=True, required=True,
                                    validators=[UniqueValidator(queryset=User.objects.all())])
-    password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
+    password = serializers.CharField(write_only=True, required=True, validators=[validate_password], min_length=8)
     first_name = serializers.CharField(write_only=True, required=True)
     last_name = serializers.CharField(write_only=True, required=False)
     profile_picture = serializers.FileField(write_only=True, required=False)
 
-    refresh = serializers.CharField(read_only=True)
-    access = serializers.CharField(read_only=True)
+    refresh = serializers.CharField(read_only=True, min_length=200, max_length=300)
+    access = serializers.CharField(read_only=True, min_length=200, max_length=300)
 
     class Meta:
         model = User
@@ -87,8 +87,8 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 class ChangePasswordSerializer(serializers.Serializer):
     old_password = serializers.CharField(required=True)
-    password = serializers.CharField(required=True, validators=[validate_password])
-    password2 = serializers.CharField(required=True)
+    password = serializers.CharField(required=True, validators=[validate_password], min_length=8)
+    password2 = serializers.CharField(required=True, min_length=8)
 
     def validate_new_password(self, value):
         user = self.context['request'].user

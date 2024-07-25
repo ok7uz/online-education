@@ -14,6 +14,7 @@ LOCAL_APPS = [
     'apps.review.apps.ReviewConfig',
     'apps.chat.apps.ChatConfig',
     'apps.notification.apps.NotificationConfig',
+    'apps.banner.apps.BannerConfig'
 ]
 
 THIRD_PARTY_APPS = [
@@ -131,6 +132,7 @@ SPECTACULAR_SETTINGS = {
     'SWAGGER_UI_SETTINGS': {
         'defaultModelRendering': 'model',
     },
+    'COMPONENT_SPLIT_REQUEST': True
 }
 
 CHANNEL_LAYERS = {

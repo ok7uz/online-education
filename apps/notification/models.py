@@ -8,7 +8,7 @@ class Notification(models.Model):
     user = models.ForeignKey('accounts.User', on_delete=models.CASCADE, related_name='notifications')
     title = models.CharField(max_length=255)
     body = models.TextField()
-    image = models.CharField(max_length=255, null=True)
+    image = models.ImageField(upload_to='notification/', null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
