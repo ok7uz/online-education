@@ -13,7 +13,14 @@ class IsAdmin(BasePermission):
 
 class IsAdminOrReadOnly(BasePermission):
     def has_permission(self, request, view):
-        return request.method in SAFE_METHODS or request.user.is_authenticated and request.user.groups.filter(name='admin').exists()
+        return (request.method in SAFE_METHODS or request.user.is_authenticated and
+                request.user.groups.filter(name='admin').exists())
+
+
+class IsAdminOrAuth(BasePermission):
+    def has_permission(self, request, view):
+        return (request.user.is_authenticated and
+                (request.method in SAFE_METHODS or request.user.groups.filter(name='admin').exists()))
 
 
 class IsTeacher(BasePermission):

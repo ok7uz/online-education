@@ -13,6 +13,7 @@ LOCAL_APPS = [
     'apps.quiz.apps.QuizConfig',
     'apps.review.apps.ReviewConfig',
     'apps.chat.apps.ChatConfig',
+    'apps.notification.apps.NotificationConfig',
 ]
 
 THIRD_PARTY_APPS = [

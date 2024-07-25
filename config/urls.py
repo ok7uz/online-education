@@ -18,6 +18,7 @@ urlpatterns = [
     path('api/', include('apps.quiz.urls')),
     path('api/', include('apps.review.urls')),
     path('api/', include('apps.chat.urls')),
+    path('api/', include('apps.notification.urls')),
 ]
 
 if settings.DEBUG:
