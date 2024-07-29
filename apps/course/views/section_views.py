@@ -3,15 +3,14 @@ from rest_framework import status
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 from apps.course.models import Section
 from apps.course.serializers.section_serializers import SectionSerializer
-from config.permissons import IsAdmin
+from config.permissons import IsAdminOrReadOnly
 
 
 class SectionList(APIView):
-    permission_classes = (IsAdmin,)
+    permission_classes = IsAdminOrReadOnly,
     serializer_class = SectionSerializer
 
     @extend_schema(tags=['Section'], responses={200: serializer_class(many=True)})
@@ -31,14 +30,10 @@ class SectionList(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def get_permissions(self):
-        if self.request.method in ('POST', 'PUT', 'DELETE'):
-            return IsAdmin(),
-        return IsAuthenticatedOrReadOnly(),
-
 
 class SectionDetail(APIView):
     serializer_class = SectionSerializer
+    permission_classes = IsAdminOrReadOnly,
 
     @extend_schema(tags=['Section'], responses={200: serializer_class()})
     def get(self, request, section_id):
@@ -63,8 +58,3 @@ class SectionDetail(APIView):
 
     def get_section(self, section_id):
         return get_object_or_404(Section, id=section_id)
-
-    def get_permissions(self):
-        if self.request.method in ('POST', 'PUT', 'DELETE'):
-            return IsAdmin(),
-        return IsAuthenticatedOrReadOnly(),

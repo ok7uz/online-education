@@ -13,7 +13,7 @@ from config.permissons import IsAuth
 
 
 class LoginAPIView(APIView):
-    permission_classes = (AllowAny,)
+    permission_classes = AllowAny,
     serializer_class = LoginSerializer
 
     @extend_schema(

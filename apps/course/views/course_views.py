@@ -1,5 +1,3 @@
-from django.db.models import Avg
-from django.db.models.functions import Round
 from django.shortcuts import get_object_or_404
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter, extend_schema, OpenApiResponse
