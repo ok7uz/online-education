@@ -21,11 +21,15 @@ class CustomIDField(models.CharField):
 
 class CustomAutoField(models.PositiveIntegerField):
 
+    def __init__(self, *args, **kwargs):
+        self.start_id = kwargs.pop('start_id', 10 ** 9 + 1)
+        super().__init__(*args, **kwargs)
+
     def pre_save(self, model_instance, add):
         if add:
             last_instance = model_instance.__class__.objects.order_by('-id').first()
             if last_instance:
-                value = max(int(last_instance.id) + 1, 10 ** 9 + 1)
+                value = max(int(last_instance.id) + 1, self.start_id)
             else:
                 value = 10 ** 9 + 1
             setattr(model_instance, self.attname, value)

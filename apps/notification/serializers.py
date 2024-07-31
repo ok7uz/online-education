@@ -10,7 +10,7 @@ class NotificationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Notification
-        fields = ['id', 'title', 'body', 'image', 'created_at']
+        fields = ['id', 'title', 'body', 'type', 'image', 'created_at']
 
     def create(self, validated_data):
         admin_user = self.context.get('request').user
@@ -24,4 +24,4 @@ class NotificationListSerializer(NotificationSerializer):
 
     class Meta:
         model = Notification
-        fields = ['id', 'title', 'image', 'created_at']
+        fields = ['id', 'title', 'image', 'type', 'created_at']

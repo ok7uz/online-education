@@ -1,8 +1,8 @@
 import django_filters.rest_framework as filters
-from django.db.models import Count, Avg, F, Case, When, Q
+from django.db.models import Count, Avg, F, Case, When
 from django.db.models.functions import Round
 
-from apps.course.models import Course, Lesson
+from apps.course.models import Course
 
 POPULAR_COURSES_COUNT = 10
 
@@ -23,7 +23,7 @@ class CourseFilter(filters.FilterSet):
         fields = ['search', 'category', 'teacher_id', 'enrolled', 'popular', 'rating', 'price']
 
     def filter_enrolled(self, queryset, _, value):
-        user = self.request.get('user', None)
+        user = self.request.user
         if not user or not user.is_authenticated:
             return queryset.none()
 

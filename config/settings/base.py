@@ -14,7 +14,8 @@ LOCAL_APPS = [
     'apps.review.apps.ReviewConfig',
     'apps.chat.apps.ChatConfig',
     'apps.notification.apps.NotificationConfig',
-    'apps.banner.apps.BannerConfig'
+    'apps.banner.apps.BannerConfig',
+    'apps.info.apps.InfoConfig'
 ]
 
 THIRD_PARTY_APPS = [
