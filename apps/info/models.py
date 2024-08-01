@@ -1,5 +1,8 @@
 from django.db import models
 
+from apps.accounts.models import User
+from apps.course.models import Course
+from apps.quiz.models import Quiz
 from config.utils import CustomAutoField
 
 
@@ -48,4 +51,27 @@ class Contact(models.Model):
         db_table = 'contact'
         verbose_name = 'contact'
         verbose_name_plural = 'contacts'
+        ordering = 'id',
+
+
+class Report(models.Model):
+
+    class Type(models.TextChoices):
+        COURSE = 'course', 'Course'
+        QUIZ = 'quiz', 'Quiz'
+        OTHER = 'other', 'Other'
+
+    id = CustomAutoField(primary_key=True, editable=False, start_id=1001)
+    type = models.CharField(max_length=10, choices=Type)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reports')
+    message = models.TextField()
+    image = models.ImageField(upload_to='reports', null=True)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='reports', null=True)
+    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name='reports', null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'report'
+        verbose_name = 'report'
+        verbose_name_plural = 'reports'
         ordering = 'id',

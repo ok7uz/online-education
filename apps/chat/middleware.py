@@ -26,9 +26,12 @@ class JwtAuthMiddleware(BaseMiddleware):
     async def __call__(self, scope, receive, send):
         headers = dict(scope['headers'])
         if b'authorization' in headers:
-            token_name, token_key = headers[b'authorization'].decode().split()
-            if token_name == 'Bearer':
+            decoded = headers[b'authorization'].decode()
+            if decoded.startswith('Bearer '):
+                token_name, token_key = decoded.split()
                 scope['user'] = await get_user(token_key)
+            else:
+                scope['user'] = AnonymousUser()
         else:
             scope['user'] = AnonymousUser()
         return await super().__call__(scope, receive, send)

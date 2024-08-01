@@ -12,4 +12,5 @@ urlpatterns = [
     path('faqs/<int:pk>/', FAQDetailView.as_view(), name='faq-detail'),
 
     path('contacts/', ContactListView.as_view(), name='contact-list'),
+    path('reports/', ReportListView.as_view(), name='report-list'),
 ]
