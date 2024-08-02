@@ -19,7 +19,7 @@ class User(AbstractUser):
     gender = models.CharField(max_length=6, choices=Gender.choices)
     bio = models.TextField(null=True)
     birth_date = models.DateField(null=True)
-    phone_number = models.CharField(max_length=20, null=True)
+    phone_number = models.CharField(max_length=20, null=True, unique=True)
     profile_picture = models.ImageField(upload_to='profiles/', null=True, blank=True)
     is_assistant = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True, db_index=True)

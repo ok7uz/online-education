@@ -1,8 +1,6 @@
-from random import sample
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import update_last_login
 from django.contrib.auth.password_validation import validate_password
-from django.core.exceptions import ValidationError
 
 from rest_framework import serializers
 from rest_framework.exceptions import AuthenticationFailed
@@ -14,15 +12,22 @@ from apps.accounts.models import User
 
 
 class LoginSerializer(serializers.Serializer):
-    email = serializers.EmailField(write_only=True)
+    login = serializers.CharField(write_only=True)
     password = PasswordField(write_only=True)
     refresh = serializers.CharField(read_only=True, min_length=200, max_length=300)
     access = serializers.CharField(read_only=True, min_length=200, max_length=300)
 
     def validate(self, attrs):
-        user = authenticate(**attrs)
+        login = attrs.get('login')
+        password = attrs.get('password')
+        if '@' in login:
+            user = authenticate(email=login, password=password)
+        else:
+            user = User.objects.filter(phone_number=login).first()
+            user = authenticate(email=user.email if user else None, password=password)
+
         if not user:
-            raise AuthenticationFailed(detail='Invalid email or password')
+            raise AuthenticationFailed(detail='Invalid login or password')
 
         if not user.is_active:
             raise AuthenticationFailed(detail='User account is disabled')
@@ -47,6 +52,8 @@ class RegisterSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(write_only=True, required=True)
     last_name = serializers.CharField(write_only=True, required=False)
     profile_picture = serializers.FileField(write_only=True, required=False)
+    is_assistant = serializers.BooleanField(write_only=True, required=False, default=False)
+    phone_number = serializers.CharField(write_only=True, required=False)
 
     refresh = serializers.CharField(read_only=True, min_length=200, max_length=300)
     access = serializers.CharField(read_only=True, min_length=200, max_length=300)
@@ -55,7 +62,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         model = User
         fields = (
             'email', 'password', 'first_name', 'last_name', 'gender', 'profile_picture', 'is_assistant',
-            'refresh', 'access'
+            'phone_number', 'refresh', 'access'
         )
         extra_kwargs = {
             'gender': {'write_only': True}
