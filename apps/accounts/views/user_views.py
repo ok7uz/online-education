@@ -57,7 +57,7 @@ class ProfileAPIView(APIView):
 
 class UserProfileAPIView(APIView):
     serializer_class = UserSerializer
-    permission_classes = (AllowAny,)
+    permission_classes = IsAdminOrReadOnly,
 
     @extend_schema(
         responses={200: UserSerializer},
@@ -68,6 +68,30 @@ class UserProfileAPIView(APIView):
         user = get_object_or_404(User, id=user_id)
         serializer = self.serializer_class(user, context={'request': request})
         return Response(serializer.data)
+
+    @extend_schema(
+        request=UserSerializer,
+        responses={200: UserSerializer},
+        tags=['User'],
+        description='Update user info'
+    )
+    def put(self, request, user_id):
+        user = get_object_or_404(User, id=user_id)
+        serializer = self.serializer_class(user, data=request.data, partial=True, context={'request': request})
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @extend_schema(
+        responses={204: None},
+        tags=['User'],
+        description='Delete user'
+    )
+    def delete(self, request, user_id):
+        user = get_object_or_404(User, id=user_id)
+        user.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class TeacherListAPIView(APIView):

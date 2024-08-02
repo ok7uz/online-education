@@ -35,7 +35,7 @@ class LessonSerializer(serializers.ModelSerializer):
         model = Lesson
         fields = [
             'id', 'title', 'content', 'order', 'video_1080p', 'video_720p', 'video_480p', 'video_360p', 
-            'video', 'duration', 'completed', 'is_available', 'quiz_group', 'quiz_group_id',
+            'video', 'duration', 'completed', 'is_open', 'is_available', 'quiz_group', 'quiz_group_id',
         ]
         read_only_fields = ['id', 'order']
 
