@@ -167,6 +167,7 @@ class Lesson(models.Model):
     duration = models.PositiveSmallIntegerField()
     order = models.SmallIntegerField(blank=True, verbose_name='order')
     quiz_group = models.ForeignKey('quiz.QuizGroup', on_delete=models.CASCADE, db_index=True)
+    is_open = models.BooleanField(default=False, db_index=True)
 
     class Meta:
         db_table = 'lesson'

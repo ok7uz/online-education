@@ -12,7 +12,7 @@ from apps.accounts.models import User
 
 
 class LoginSerializer(serializers.Serializer):
-    login = serializers.CharField(write_only=True)
+    login = serializers.CharField(write_only=True, help_text='Phone number or email')
     password = PasswordField(write_only=True)
     refresh = serializers.CharField(read_only=True, min_length=200, max_length=300)
     access = serializers.CharField(read_only=True, min_length=200, max_length=300)

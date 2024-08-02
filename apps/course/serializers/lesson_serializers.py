@@ -46,6 +46,8 @@ class LessonSerializer(serializers.ModelSerializer):
         return CompletedLesson.objects.filter(user=user, lesson=lesson).exists()
 
     def get_is_available(self, lesson) -> bool:
+        if lesson.is_open:
+            return True
         user = self.context.get('request').user
         if user.is_anonymous or not user.enrollments.filter(course=lesson.section.course).exists():
             return False
